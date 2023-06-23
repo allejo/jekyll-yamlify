@@ -1,0 +1,37 @@
+---
+yaml:
+  my-string: Hello world
+  my-boolean: true
+  my-date: 2020-03-14
+  my-number: 12345
+  my-str-array:
+    - apple
+    - orange
+    - pear
+  my-colors:
+    red: "#f00"
+    green: "#0f0"
+    blue: "#00f"
+---
+
+<div>
+{% include yamlify.html key="yaml" value=page.yaml %}
+</div>
+
+<!-- /// -->
+
+<div>
+yaml:
+  my-string: "Hello world"
+  my-boolean: true
+  my-date: "2020-03-14"
+  my-number: 12345
+  my-str-array:
+    - "apple"
+    - "orange"
+    - "pear"
+  my-colors:
+    red: "#f00"
+    green: "#0f0"
+    blue: "#00f"
+</div>
