@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Usage Support
+    # Relative URLs don't work; https://github.com/orgs/community/discussions/5166
+    url: https://github.com/USER/REPO/discussions
+    about: Ask and answer questions about how to use this project
