@@ -23,17 +23,42 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     OTHER DEALINGS IN THE SOFTWARE.
   {% endcomment %}
+  {% comment %}
+    Version 1.0.0
+      https://github.com/allejo/jekyll-yamlify
+
+    Usage:
+        {% include yamlify.html key="my_key" value=some_value %}
+
+    Parameters:
+        * value        (any) - any YAML-compatible value that will be written out as prettified YAML
+
+    Optional Parameters:
+        * key          (string) :       ''       - a top-level YAML key to use when printing out the given value
+        * include_path (string) : 'yamilfy.html' - the relative path to this include; use this is you rename the include or put it subfolders
+        * indent_chars (string) :      '  '      - the indentation that will be used for each line
+        * indent_count (int)    :       1        - the amount of times a given value needs to be indented when written
+
+    Output:
+        A pretty printed representation of a given value in YAML compatible format
+  {% endcomment %}
 
   {% capture NEWLINE %}
   {% endcapture %}
   {% assign NEWLINE = NEWLINE | replace: " ", "" %}
-  {% assign INDENT_CHARS = "  " %}
 
+  <!--
+  This is a recursive include, so we need the name of it so we can include it
+  recursively easily.
+  -->
   {% assign _self = include.include_path | default: "yamlify.html" %}
+
   {% assign value = include.value %}
   {% assign value_json_type = value | jsonify | slice: 0 %}
-  {% assign indent_count = include.indent_count | default: 1 %}
+
   {% assign indent = "" %}
+  {% assign indent_chars = include.indent_chars | default: "  " %}
+  {% assign indent_count = include.indent_count | default: 1 %}
 
   {% if include.key %}
     {% capture output %}{{ output }}{{ include.key }}:{{ NEWLINE }}{% endcapture %}
@@ -43,7 +68,7 @@
 
   {% if value_json_type == '"' %}
     <!-- [ null, {{ value }} ] -->
-    {% assign child_array = "" | split: "/" | | push: nil | push: value %}
+    {% assign child_array = "" | split: "/" | push: nil | push: value %}
 
     <!-- [ [null, {{ value }}] ] -->
     {% assign parent_array = "" | split: "/" | push: child_array %}
@@ -59,9 +84,10 @@
   when we're iterating through a hashmap.
   -->
   {% for entry in value %}
+    <!-- Generate the indentation needed for the current level of printing -->
     {% assign indent = "" %}
     {% for i in (1..indent_count) %}
-      {% capture indent %}{{ indent }}{{ INDENT_CHARS }}{% endcapture %}
+      {% capture indent %}{{ indent }}{{ indent_chars }}{% endcapture %}
     {% endfor %}
 
     {% assign yaml_key = entry[0] %}
@@ -88,12 +114,19 @@
       {% assign data_type = "number" %}
     {% endif %}
 
-    <!-- These wrapper variables exist solely for convenient debugging -->
+    <!--
+    These wrapper variables exist solely for convenient debugging. For example,
+    adding `# {{ data_type }}` to `line_ending` will add a comment that shows
+    the data type for each specific line.
+    -->
     {% capture line_start %}{{ yaml_key }}:{% endcapture %}
     {% capture line_ending %}{{ NEWLINE }}{% endcapture %}
 
+    <!--
+    Our YAML key will be nil whenever we're given an element from an array.
+    -->
     {% if yaml_key == nil %}
-      {% capture line_start %}{{ INDENT_CHARS }}-{% endcapture %}
+      {% capture line_start %}{{ indent_chars }}-{% endcapture %}
     {% endif %}
 
     {% case data_type %}

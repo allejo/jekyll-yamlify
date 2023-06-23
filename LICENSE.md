@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © <YEAR> <YOUR NAME>
+Copyright © 2023 Vladimir "allejo" Jimenez
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
