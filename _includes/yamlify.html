@@ -139,12 +139,12 @@
       {% when "array" %}
         {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% endcapture %}
         {% for arrayItem in yaml_value %}
-          {% capture output -%}{{ output }}{% include {{ _self }} value=arrayItem indent_count=1 %}{%- endcapture %}
+          {% capture output -%}{{ output }}{% include {{ _self }} include_path=_self value=arrayItem indent_count=1 %}{%- endcapture %}
         {% endfor %}
 
       {% when "object" %}
         {% assign newindent_count = indent_count | plus: 1 %}
-        {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% include {{ _self }} value=yaml_value indent_count=newindent_count %}{% endcapture %}
+        {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% include {{ _self }} include_path=_self value=yaml_value indent_count=newindent_count %}{% endcapture %}
     {% endcase %}
   {% endfor %}
 
