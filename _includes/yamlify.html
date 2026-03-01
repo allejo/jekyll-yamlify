@@ -85,6 +85,9 @@
   -->
   {% for entry in value %}
     <!-- Generate the indentation needed for the current level of printing -->
+    <!-- Restore from include.* since recursive includes corrupt shared variables -->
+    {% assign indent_count = include.indent_count | default: 1 %}
+    {% assign indent_chars = include.indent_chars | default: "  " %}
     {% assign indent = "" %}
     {% for i in (1..indent_count) %}
       {% capture indent %}{{ indent }}{{ indent_chars }}{% endcapture %}
@@ -129,6 +132,8 @@
       {% capture line_start %}{{ indent_chars }}-{% endcapture %}
     {% endif %}
 
+    {% assign new_indent_count = indent_count | plus: 1 %}
+
     {% case data_type %}
       {% when "string" %}
         {% capture output %}{{ output }}{{ indent }}{{ line_start }} "{{ yaml_value }}"{{ line_ending }}{% endcapture %}
@@ -139,12 +144,11 @@
       {% when "array" %}
         {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% endcapture %}
         {% for arrayItem in yaml_value %}
-          {% capture output -%}{{ output }}{% include {{ _self }} include_path=_self value=arrayItem indent_count=1 %}{%- endcapture %}
+          {% capture output -%}{{ output }}{% include {{ _self }} include_path=_self value=arrayItem indent_count=new_indent_count %}{%- endcapture %}
         {% endfor %}
 
       {% when "object" %}
-        {% assign newindent_count = indent_count | plus: 1 %}
-        {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% include {{ _self }} include_path=_self value=yaml_value indent_count=newindent_count %}{% endcapture %}
+        {% capture output %}{{ output }}{{ indent }}{{ line_start }}{{ line_ending }}{% include {{ _self }} include_path=_self value=yaml_value indent_chars=include.indent_chars indent_count=new_indent_count %}{% endcapture %}
     {% endcase %}
   {% endfor %}
 
@@ -155,4 +159,4 @@
   {% if include.key %}
     {% assign output = output | strip %}
   {% endif %}
-{% endcapture %}{{- output -}}
+{% endcapture %}{{- output -}}{% assign output = "" %}{% assign yamlWorkspace = "" -%}
